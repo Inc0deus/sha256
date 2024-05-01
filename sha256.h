@@ -6,20 +6,14 @@
 using namespace std;
 
 typedef size_t length_t, position_t;
-const length_t l_8 = 8;
-const length_t l_16 = 16;
-const length_t l_32 = 32;
-const length_t l_64 = 64;
-const length_t l_256 = 256;
-const length_t l_512 = 512;
 
 string hex_digit = "0123456789abcdef";
-string bin32_to_hex(bitset<l_32> bin) {
+string bin32_to_hex(bitset<32> bin) {
     string hex_str = "";
-    for (position_t i = 0; i < l_32; i+=4) { hex_str = hex_digit[bin[i+3]*8 + bin[i+2]*4 +bin[i+1]*2 + bin[i]] + hex_str; }
+    for (position_t i = 0; i < 32; i+=4) { hex_str = hex_digit[bin[i+3]*8 + bin[i+2]*4 +bin[i+1]*2 + bin[i]] + hex_str; }
     return hex_str;
 }
-bitset<l_32> hex_to_bin32(string hex) {
+bitset<32> hex_to_bin32(string hex) {
     string bin = "";
     for (int i = 0; i < 8; i++) {
         switch(hex[i])
@@ -42,19 +36,19 @@ bitset<l_32> hex_to_bin32(string hex) {
             case 'f': bin += "1111"; break;
         }
     }
-    return bitset<l_32>(bin);
+    return bitset<32>(bin);
 }
 
 //! basic operations
 #define SHR(x, n)  (x >> n)                     // SHIFT RIGHT  : 10101 -> 01010
 #define ROTR(x, n) ((x >> n) | (x << (32-n)))   // ROTATE RIGHT : 10101 -> 11010
 
-bitset<l_32> ADD(vector<bitset<l_32> > bins) {  // ADD modulo 2^32
+bitset<32> ADD(vector<bitset<32> > bins) {  // ADD modulo 2^32
     uint32_t RES = 0;
     for(position_t i = 0; i < bins.size(); i++) {
         RES += bins[i].to_ullong();
     }
-    return bitset<l_32>(RES);
+    return bitset<32>(RES);
 }
 
 //! functions
@@ -106,50 +100,50 @@ string K[64] = {
 
 string hash256(string input) {
     // PREPROCESSING
-    length_t l = l_8 * input.length();
+    length_t l = 8 * input.length();
     int N = (l + 64) / 512 + 1;
     length_t k = (N * 512 - 64) - (l + 1);
 
     string str_message = "";
     for(position_t i = 0; i < input.length(); i++) {
-        str_message += bitset<l_8>(input[i]).to_string();
+        str_message += bitset<8>(input[i]).to_string();
     }
     str_message += "1";
     for(length_t i = 0; i < k; i++) {
         str_message += "0";
     }
-    str_message += bitset<l_64>(l).to_string();
+    str_message += bitset<64>(l).to_string();
 
-    vector<bitset<l_512> > message_blocks;
+    vector<bitset<512> > message_blocks;
     for(position_t i = 0; i < N; i++) {
         string message = "";
-        for(position_t j = 0; j < l_512; j++) {
-            message += str_message[i * l_512 + j];
+        for(position_t j = 0; j < 512; j++) {
+            message += str_message[i * 512 + j];
         }
-        message_blocks.push_back(bitset<l_512>(message));
+        message_blocks.push_back(bitset<512>(message));
     }
 
     // HASH COMPUTATION
-    bitset<l_32> H[8];
-    for(position_t i = 0; i < l_8; i++) H[i] = bitset<l_32>(H_0[i]);
-    bitset<l_32> T1, T2;
-    bitset<l_32> a = H[0];
-    bitset<l_32> b = H[1];
-    bitset<l_32> c = H[2];
-    bitset<l_32> d = H[3];
-    bitset<l_32> e = H[4];
-    bitset<l_32> f = H[5];
-    bitset<l_32> g = H[6];
-    bitset<l_32> h = H[7];
+    bitset<32> H[8];
+    for(position_t i = 0; i < 8; i++) H[i] = bitset<32>(H_0[i]);
+    bitset<32> T1, T2;
+    bitset<32> a = H[0];
+    bitset<32> b = H[1];
+    bitset<32> c = H[2];
+    bitset<32> d = H[3];
+    bitset<32> e = H[4];
+    bitset<32> f = H[5];
+    bitset<32> g = H[6];
+    bitset<32> h = H[7];
 
     for(position_t i = 0; i < N; i++) {
-        bitset<l_32> W[64];
-        for (position_t t = 0; t < l_16; t++) {
-            for (position_t j = 0; j < l_32; j++) {
+        bitset<32> W[64];
+        for (position_t t = 0; t < 16; t++) {
+            for (position_t j = 0; j < 32; j++) {
                 W[t][32 - (j + 1)] = message_blocks[i][512 - (t * 32 + j + 1)];
             }
         }
-        for (position_t t = l_16; t < l_64; t++) {
+        for (position_t t = 16; t < 64; t++) {
             W[t] = ADD({W[t-7], W[t-16], sigma_0(W[t-15]), sigma_1(W[t-2])});
         }
 
@@ -162,8 +156,8 @@ string hash256(string input) {
         g = H[6];
         h = H[7];
 
-        for (position_t t = 0; t < l_64; t++) {
-            T1 = ADD({SIGMA_1(e), Ch(e, f, g), h, bitset<l_32>(K[t]), W[t]});
+        for (position_t t = 0; t < 64; t++) {
+            T1 = ADD({SIGMA_1(e), Ch(e, f, g), h, bitset<32>(K[t]), W[t]});
             T2 = ADD({SIGMA_0(a), Maj(a, b, c)});
             h = g;
             g = f;
@@ -175,25 +169,25 @@ string hash256(string input) {
             a = ADD({T1, T2});
         }
         
-        H[0] = ADD({a, bitset<l_32>(H[0])});
-        H[1] = ADD({b, bitset<l_32>(H[1])});
-        H[2] = ADD({c, bitset<l_32>(H[2])});
-        H[3] = ADD({d, bitset<l_32>(H[3])});
-        H[4] = ADD({e, bitset<l_32>(H[4])});
-        H[5] = ADD({f, bitset<l_32>(H[5])});
-        H[6] = ADD({g, bitset<l_32>(H[6])});
-        H[7] = ADD({h, bitset<l_32>(H[7])});
+        H[0] = ADD({a, bitset<32>(H[0])});
+        H[1] = ADD({b, bitset<32>(H[1])});
+        H[2] = ADD({c, bitset<32>(H[2])});
+        H[3] = ADD({d, bitset<32>(H[3])});
+        H[4] = ADD({e, bitset<32>(H[4])});
+        H[5] = ADD({f, bitset<32>(H[5])});
+        H[6] = ADD({g, bitset<32>(H[6])});
+        H[7] = ADD({h, bitset<32>(H[7])});
     }
 
     string output = "";
-    output += bin32_to_hex(bitset<l_32>(H[0]))
-            + bin32_to_hex(bitset<l_32>(H[1]))
-            + bin32_to_hex(bitset<l_32>(H[2]))
-            + bin32_to_hex(bitset<l_32>(H[3]))
-            + bin32_to_hex(bitset<l_32>(H[4]))
-            + bin32_to_hex(bitset<l_32>(H[5]))
-            + bin32_to_hex(bitset<l_32>(H[6]))
-            + bin32_to_hex(bitset<l_32>(H[7]));
+    output += bin32_to_hex(bitset<32>(H[0]))
+            + bin32_to_hex(bitset<32>(H[1]))
+            + bin32_to_hex(bitset<32>(H[2]))
+            + bin32_to_hex(bitset<32>(H[3]))
+            + bin32_to_hex(bitset<32>(H[4]))
+            + bin32_to_hex(bitset<32>(H[5]))
+            + bin32_to_hex(bitset<32>(H[6]))
+            + bin32_to_hex(bitset<32>(H[7]));
 
     return output;
 }
