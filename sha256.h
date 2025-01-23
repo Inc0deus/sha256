@@ -10,14 +10,16 @@ typedef size_t length_t, position_t;
 string hex_digit = "0123456789abcdef";
 string bin32_to_hex(bitset<32> bin) {
     string hex_str = "";
-    for (position_t i = 0; i < 32; i+=4) { hex_str = hex_digit[bin[i+3]*8 + bin[i+2]*4 +bin[i+1]*2 + bin[i]] + hex_str; }
+    for (position_t i = 0; i < 32; i+=4) {
+        hex_str = hex_digit[bin[i+3]*8 + bin[i+2]*4 +bin[i+1]*2 + bin[i]] + hex_str; 
+    }
     return hex_str;
 }
+
 bitset<32> hex_to_bin32(string hex) {
     string bin = "";
     for (int i = 0; i < 8; i++) {
-        switch(hex[i])
-        {
+        switch(hex[i]) {
             case '0': bin += "0000"; break;
             case '1': bin += "0001"; break;
             case '2': bin += "0010"; break;
@@ -39,9 +41,9 @@ bitset<32> hex_to_bin32(string hex) {
     return bitset<32>(bin);
 }
 
-//! basic operations
-#define SHR(x, n)  (x >> n)                     // SHIFT RIGHT  : 10101 -> 01010
-#define ROTR(x, n) ((x >> n) | (x << (32-n)))   // ROTATE RIGHT : 10101 -> 11010
+// BASIC OPERATIONS
+#define SHR(x, n)  (x >> n)                     // SHIFT RIGHT
+#define ROTR(x, n) ((x >> n) | (x << (32-n)))   // ROTATE RIGHT
 
 bitset<32> ADD(vector<bitset<32> > bins) {  // ADD modulo 2^32
     uint32_t RES = 0;
@@ -51,7 +53,7 @@ bitset<32> ADD(vector<bitset<32> > bins) {  // ADD modulo 2^32
     return bitset<32>(RES);
 }
 
-//! functions
+// FUNCTIONS
 #define sigma_0(x) ((ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3)))
 #define sigma_1(x) ((ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10)))
 
@@ -61,7 +63,7 @@ bitset<32> ADD(vector<bitset<32> > bins) {  // ADD modulo 2^32
 #define Ch(x, y, z) ((x & y) ^ (~x & z))
 #define Maj(x, y, z) ((x & y) ^ (x & z) ^ (y & z))
 
-//! constants
+// CONSTANTS
 // vector<double> primes = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311};
 // string H_0[8] = {"6a09e667", "bb67ae85", "3c6ef372", "a54ff53a", "510e527f", "9b05688c", "1f83d9ab", "5be0cd19"};
 // string K[64] = {
@@ -74,6 +76,7 @@ bitset<32> ADD(vector<bitset<32> > bins) {  // ADD modulo 2^32
 //     "19a4c116", "1e376c08", "2748774c", "34b0bcb5", "391c0cb3", "4ed8aa4a", "5b9cca4f", "682e6ff3", 
 //     "748f82ee", "78a5636f", "84c87814", "8cc70208", "90befffa", "a4506ceb", "bef9a3f7", "c67178f2"
 // };
+
 string H_0[8] = {
     "01101010000010011110011001100111","10111011011001111010111010000101","00111100011011101111001101110010","10100101010011111111010100111010",
     "01010001000011100101001001111111","10011011000001010110100010001100","00011111100000111101100110101011","01011011111000001100110100011001",

@@ -1,7 +1,7 @@
 # sha256 implementation
 
-This is an implementation of the sha256 hash function in C++ (in one header "sha256.h").
-The code is not made to be particularly fast so it is not intended for real use cases, only for learning. The tests I did showed that the hashing took approximately 0.00066s (tests made on 100 strings of 1000 characters 100 times).
+This is a one header implementation of the sha256 hash function in C++.
+The code was not made to be particularly fast and is not intended for real use cases. It was only made for learning purposes.
 
 The main function is "hash265", it takes a string (unicode characters) and return another string (hexadecimal characters - 0123456789abcdef).
-"main.cpp" is for demo purposes and is not usefull to the hashing function.
+The file "example.cpp" shows how it could be used.
